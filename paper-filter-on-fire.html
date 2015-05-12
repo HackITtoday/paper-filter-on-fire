@@ -1,0 +1,28 @@
+<link rel="import" href="../paper-card/paper-card.html">
+<polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" noscript attributes="data filter filtedKeys">
+
+<template>
+<style>
+  mini-badge {
+    display: inline-block;
+    min-width: 10px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: 100;
+    color: #FFF;
+    line-height: 1.2;
+    vertical-align: baseline;
+    white-space: nowrap;
+    text-align: center;
+    background-color: #6F6F6F;
+    border-radius: 10px;
+  }
+</style>
+    <template repeat="{{x in $.globals.values.listings | justProperties(data,'facilities')}}">
+      <paper-button raised?="ifFiltered" on-tap="{{setFilter}}" filter="facilities" title="{{x.name}}">
+        {{x.name}}<mini-badge>{{x.num}}</mini-badge>
+      </paper-button>
+    </template>
+</template>
+
+</polymer-element>
