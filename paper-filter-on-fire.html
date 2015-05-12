@@ -1,5 +1,5 @@
 <link rel="import" href="../paper-button/paper-button.html">
-<polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" attributes="data filter filtedKeys">
+<polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" attributes="data keys filter filtedKeys by">
 
 <template>
 <style>
@@ -18,8 +18,8 @@
     border-radius: 10px;
   }
 </style>
-    <template repeat="{{x in $.globals.values.listings | justProperties(data,'facilities')}}">
-      <paper-button raised?="ifFiltered" on-tap="{{setFilter}}" filter="facilities" title="{{x.name}}">
+    <template repeat="{{x in keys| justProperties(data, by)}}">
+      <paper-button raised?="ifFiltered" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
         {{x.name}}<mini-badge>{{x.num}}</mini-badge>
       </paper-button>
     </template>
@@ -178,7 +178,8 @@
         return output;
       }
     },
-    ready: function() { console.log('ready');
+    ready: function() { 
+      console.log('Filter Ready');
     }
   });
 </script>
