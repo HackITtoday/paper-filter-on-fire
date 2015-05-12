@@ -1,5 +1,5 @@
-<link rel="import" href="../paper-card/paper-card.html">
-<polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" noscript attributes="data filter filtedKeys">
+<link rel="import" href="../paper-button/paper-button.html">
+<polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" attributes="data filter filtedKeys">
 
 <template>
 <style>
@@ -25,4 +25,161 @@
     </template>
 </template>
 
+<script>
+  function getArray(value,data,theArray) {
+    var is = [];
+    if (hasOwnProperty(data[value],theArray)) {
+      is = data[value][theArray];
+    }
+    return is;
+  }  
+  function ofCat (value, data, cat) {
+    if (data[value]["cat"] !== cat) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  function firstType (value,data) {
+    var isFirst = false;
+    for(var index in data) { 
+      var attr = data[index].type; 
+      if (data[value].type === attr) {
+        if (isFirst) {
+          return false;
+          } else {
+          isFirst = true;
+        }
+        if (index === value) {
+          return isFirst;
+        }
+      }
+    }
+    return true;
+  }  
+  function ofType (value,data,type) {
+    if (data[value].type !== type) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  function hasOwnProperty(obj, prop) {
+    if (obj === null) {
+      return false;
+    }
+    var proto = obj.__proto__ || obj.constructor.prototype;
+    return (prop in obj) &&
+    (!(prop in proto) || proto[prop] !== obj[prop]);
+  }
+  function isEmpty(obj) {
+    for(var prop in obj) {
+      if(obj.hasOwnProperty(prop))
+      return false;
+    }
+    return true;
+  }
+  function hasTypes (data,types) {
+    var has = false;
+    for (var key in types) {
+      if (types.hasOwnProperty(key)) {
+        var obj = types[key];
+        for (var prop in obj) {
+          if(obj.hasOwnProperty(prop)){
+            if (data.hasOwnProperty(key)) {
+              if (obj[prop]) {
+                if (data[key].indexOf(prop) === -1 ) {
+                  return false;
+                }
+              }
+            } else {
+              return false;
+            }
+          }
+        }
+      }
+    }
+    return true;
+  }
+  Polymer({
+    ifFiltered: function(e) {
+      if (hasOwnProperty(e.currentTarget.attributes,"filter")){
+        if (hasOwnProperty(e.currentTarget,"raised")) {
+          if (hasOwnProperty(this.filters,e.currentTarget.attributes["filter"].value)) {
+            if (hasOwnProperty(this.filters[e.currentTarget.attributes["filter"].value], e.currentTarget.attributes["title"].value)) {
+              e.currentTarget.raised = !this.filters[e.currentTarget.attributes["filter"].value][e.currentTarget.attributes["title"].value];
+            }
+          }
+        }
+      }
+    },
+    setFilter: function(e) {
+      if (hasOwnProperty(e.currentTarget.attributes,"filter")){
+        if (hasOwnProperty(e.currentTarget.attributes.filter, "value")) {
+          if (hasOwnProperty(this.filters, e.currentTarget.attributes.filter.value)) {
+            this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes["title"].value] = 
+            !this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes["title"].value];
+          } else {
+            this.filters[e.currentTarget.attributes.filter.value] = {};
+            this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes["title"].value] = true;
+          }
+          this.$.globals.values.listings = this.justOfTypes(this.keys, this.data, this.filters);
+        }
+      }
+    },
+    justProperties: function(value,data,properties){ console.log('justProperties');
+      var output = [];
+      var output_num = [];
+      if (value !== undefined && value !== null ) {
+        value.forEach(function(entry) {
+          getArray(entry, data, properties).forEach(function(entryA) {
+            if (output.indexOf(entryA) === -1){
+              output.push(entryA); 
+              output_num.push( 1 );
+            } else {
+              output_num[output.indexOf(entryA)]++;
+            }
+          });
+        });
+      }
+      var result = [];
+      for (var i = 0, l = output.length; i < l; i++) {
+        result[i] = {name:output[i],num:output_num[i]};
+      }
+      return result;
+    },
+    justCardsOfCats: function(value,data,type){ // needs work
+      console.log('justCardsOfCats');
+      if (type === 'All') {
+        return value;
+      } else {
+        var output = [];
+        value.forEach(function(entry) {
+          if (ofCat(entry,data,type)) {
+            output.push(entry); 
+          }
+        });
+        return output;
+      }
+    },
+    justOfTypes: function(value,data,types){ console.log('justOfTypes');
+      if (value === null) {
+        return null;
+      }
+      if (isEmpty(types)) {
+        return value;
+        } else {
+        var output = [];
+        value.forEach(function(entry) {
+          if (hasTypes(data[entry],types)) {
+            output.push(entry); 
+          }
+        });
+        return output;
+      }
+    },
+    ready: function() { console.log('ready');
+    }
+  });
+</script>
 </polymer-element>
