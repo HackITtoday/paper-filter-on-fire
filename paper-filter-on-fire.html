@@ -1,8 +1,11 @@
 <link rel="import" href="../paper-button/paper-button.html">
-<polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" attributes="data keys filter filtedKeys by">
+<polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" attributes="data keys show filters filteredKeys by">
 
 <template>
 <style>
+  paper-button {
+    background: #fff;
+  }
   mini-badge {
     display: inline-block;
     min-width: 10px;
@@ -18,7 +21,7 @@
     border-radius: 10px;
   }
 </style>
-    <template repeat="{{x in keys| justProperties(data, by)}}">
+    <template repeat="{{x in show | justProperties(data, by)}}">
       <paper-button raised?="ifFiltered" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
         {{x.name}}<mini-badge>{{x.num}}</mini-badge>
       </paper-button>
@@ -33,54 +36,27 @@
     }
     return is;
   }  
-  function ofCat (value, data, cat) {
-    if (data[value]["cat"] !== cat) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-  function firstType (value,data) {
-    var isFirst = false;
-    for(var index in data) { 
-      var attr = data[index].type; 
-      if (data[value].type === attr) {
-        if (isFirst) {
-          return false;
-          } else {
-          isFirst = true;
-        }
-        if (index === value) {
-          return isFirst;
-        }
-      }
-    }
-    return true;
-  }  
-  function ofType (value,data,type) {
-    if (data[value].type !== type) {
-      return false;
-    } else {
-      return true;
-    }
-  }
   function hasOwnProperty(obj, prop) {
-    if (obj === null) {
+    if (typeof obj === 'object' ) {
+      if (obj === null) {
+        return false;
+      }
+      return obj.hasOwnProperty(prop); 
+    } else if (typeof obj === 'undefined') {
       return false;
+    } else {
+      debugger;
     }
-    var proto = obj.__proto__ || obj.constructor.prototype;
-    return (prop in obj) &&
-    (!(prop in proto) || proto[prop] !== obj[prop]);
   }
   function isEmpty(obj) {
     for(var prop in obj) {
-      if(obj.hasOwnProperty(prop))
-      return false;
+      if(obj.hasOwnProperty(prop)) {
+        return false;
+      }
     }
     return true;
   }
   function hasTypes (data,types) {
-    var has = false;
     for (var key in types) {
       if (types.hasOwnProperty(key)) {
         var obj = types[key];
@@ -102,65 +78,59 @@
     return true;
   }
   Polymer({
-    ifFiltered: function(e) {
-      if (hasOwnProperty(e.currentTarget.attributes,"filter")){
-        if (hasOwnProperty(e.currentTarget,"raised")) {
-          if (hasOwnProperty(this.filters,e.currentTarget.attributes["filter"].value)) {
-            if (hasOwnProperty(this.filters[e.currentTarget.attributes["filter"].value], e.currentTarget.attributes["title"].value)) {
-              e.currentTarget.raised = !this.filters[e.currentTarget.attributes["filter"].value][e.currentTarget.attributes["title"].value];
+    publish: {
+      filteredKeys: [],
+      show: []
+    },
+    ifFiltered: function(e) { console.log('ifFiltered');
+      if (hasOwnProperty(e.currentTarget.attributes,'filter')){
+        if (hasOwnProperty(e.currentTarget,'raised')) {
+          if (hasOwnProperty(this.filters,e.currentTarget.attributes.filter.value)) {
+            if (hasOwnProperty(this.filters[e.currentTarget.attributes.filter.value], e.currentTarget.attributes.title.value)) {
+              e.currentTarget.raised = !this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes.title.value];
             }
           }
         }
       }
     },
-    setFilter: function(e) {
-      if (hasOwnProperty(e.currentTarget.attributes,"filter")){
-        if (hasOwnProperty(e.currentTarget.attributes.filter, "value")) {
+    setFilter: function(e) { console.log('setFilter');
+      if (hasOwnProperty(e.currentTarget.attributes,'filter')){
+        if (hasOwnProperty(e.currentTarget.attributes.filter, 'value')) {
           if (hasOwnProperty(this.filters, e.currentTarget.attributes.filter.value)) {
-            this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes["title"].value] = 
-            !this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes["title"].value];
+            this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes.title.value] = 
+            !this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes.title.value];
           } else {
+            if (this.filters === undefined) { 
+              this.filters = {};
+            }
             this.filters[e.currentTarget.attributes.filter.value] = {};
-            this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes["title"].value] = true;
+            this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes.title.value] = true;
           }
-          this.$.globals.values.listings = this.justOfTypes(this.keys, this.data, this.filters);
+          this.filteredKeys = this.justOfTypes(this.keys, this.data, this.filters);
         }
       }
     },
     justProperties: function(value,data,properties){ console.log('justProperties');
       var output = [];
-      var output_num = [];
+      var outputNum = [];
       if (value !== undefined && value !== null ) {
-        value.forEach(function(entry) {
-          getArray(entry, data, properties).forEach(function(entryA) {
-            if (output.indexOf(entryA) === -1){
-              output.push(entryA); 
-              output_num.push( 1 );
+        var test = function(entryA) {
+          if (output.indexOf(entryA) === -1){
+            output.push(entryA); 
+            outputNum.push( 1 );
             } else {
-              output_num[output.indexOf(entryA)]++;
-            }
-          });
-        });
+            outputNum[output.indexOf(entryA)]++;
+          }
+        };
+        for(var entry in value) {
+          getArray(entry, data, properties).forEach(test);
+        }
       }
       var result = [];
       for (var i = 0, l = output.length; i < l; i++) {
-        result[i] = {name:output[i],num:output_num[i]};
+        result[i] = {name:output[i],num:outputNum[i]};
       }
       return result;
-    },
-    justCardsOfCats: function(value,data,type){ // needs work
-      console.log('justCardsOfCats');
-      if (type === 'All') {
-        return value;
-      } else {
-        var output = [];
-        value.forEach(function(entry) {
-          if (ofCat(entry,data,type)) {
-            output.push(entry); 
-          }
-        });
-        return output;
-      }
     },
     justOfTypes: function(value,data,types){ console.log('justOfTypes');
       if (value === null) {
@@ -180,6 +150,7 @@
     },
     ready: function() { 
       console.log('Filter Ready');
+      this.keys = this.filteredKeys;
     }
   });
 </script>
