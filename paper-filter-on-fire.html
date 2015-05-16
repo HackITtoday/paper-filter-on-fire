@@ -21,11 +21,11 @@
     border-radius: 10px;
   }
 </style>
-    <template repeat="{{x in show | justProperties(data, by)}}">
-      <paper-button raised?="ifFiltered" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
-        {{x.name}}<mini-badge>{{x.num}}</mini-badge>
-      </paper-button>
-    </template>
+  <template repeat="{{x in show | justProperties(data, by)}}">
+    <paper-button raised?="ifFiltered" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
+      {{x.name}} <mini-badge>{{x.num}}</mini-badge>
+    </paper-button>
+  </template>
 </template>
 
 <script>
@@ -82,6 +82,9 @@
       filteredKeys: [],
       show: []
     },
+    keysChanged: function(oldValue, newValue) {
+      this.filteredKeys = newValue;
+    },
     ifFiltered: function(e) { console.log('ifFiltered');
       if (hasOwnProperty(e.currentTarget.attributes,'filter')){
         if (hasOwnProperty(e.currentTarget,'raised')) {
@@ -123,7 +126,7 @@
           }
         };
         for(var entry in value) {
-          getArray(entry, data, properties).forEach(test);
+          getArray(value[entry], data, properties).forEach(test);
         }
       }
       var result = [];
@@ -150,7 +153,6 @@
     },
     ready: function() { 
       console.log('Filter Ready');
-      this.keys = this.filteredKeys;
     }
   });
 </script>
