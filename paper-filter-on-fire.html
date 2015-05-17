@@ -133,6 +133,10 @@
       for (var i = 0, l = output.length; i < l; i++) {
         result[i] = {name:output[i],num:outputNum[i]};
       }
+      result.sort(function(a, b) {
+        return b.num - a.num
+      })
+
       return result;
     },
     justOfTypes: function(value,data,types){ console.log('justOfTypes');
