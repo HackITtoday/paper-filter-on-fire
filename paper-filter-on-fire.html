@@ -85,15 +85,15 @@
     keysChanged: function(oldValue, newValue) {
       this.filteredKeys = newValue;
     },
-    ifFiltered: function(e) { console.log('ifFiltered');
-      if (hasOwnProperty(e.currentTarget.attributes,'filter')){
-        if (hasOwnProperty(e.currentTarget,'raised')) {
-          if (hasOwnProperty(this.filters,e.currentTarget.attributes.filter.value)) {
-            if (hasOwnProperty(this.filters[e.currentTarget.attributes.filter.value], e.currentTarget.attributes.title.value)) {
-              e.currentTarget.raised = !this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes.title.value];
-            }
-          }
+    ifFiltered: function(name, properties) { console.log('ifFiltered');
+      if (hasOwnProperty(this.filters,properties)) {
+        if (hasOwnProperty(this.filters[properties], name)) {
+          return this.filters[properties][name];
+          } else { 
+          return false;
         }
+        } else {
+        return false;
       }
     },
     setFilter: function(e) { console.log('setFilter');
@@ -131,10 +131,10 @@
       }
       var result = [];
       for (var i = 0, l = output.length; i < l; i++) {
-        result[i] = {name:output[i],num:outputNum[i],filtered:this.ifFiltered(output[i])};
+        result[i] = {name:output[i],num:outputNum[i],filtered:this.ifFiltered(output[i],properties)};
       }
       result.sort(function(a, b) {
-        return b.num - a.num
+        return b.num - a.num;
       })
 
       return result;
