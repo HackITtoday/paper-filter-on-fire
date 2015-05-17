@@ -22,7 +22,7 @@
   }
 </style>
   <template repeat="{{x in show | justProperties(data, by)}}">
-  <paper-button raised="{{x.filtered}}" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
+  <paper-button raised="{{!x.filtered}}" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
       {{x.name}} <mini-badge>{{x.num}}</mini-badge>
     </paper-button>
   </template>
