@@ -22,7 +22,7 @@
   }
 </style>
   <template repeat="{{x in show | justProperties(data, by)}}">
-    <paper-button raised?="ifFiltered" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
+  <paper-button raised="{{x.filtered}}" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
       {{x.name}} <mini-badge>{{x.num}}</mini-badge>
     </paper-button>
   </template>
@@ -131,7 +131,7 @@
       }
       var result = [];
       for (var i = 0, l = output.length; i < l; i++) {
-        result[i] = {name:output[i],num:outputNum[i]};
+        result[i] = {name:output[i],num:outputNum[i],filtered:this.ifFiltered(output[i])};
       }
       result.sort(function(a, b) {
         return b.num - a.num
