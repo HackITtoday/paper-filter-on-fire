@@ -3,10 +3,16 @@
 <!-- <mini-badge>{{x.num}}</mini-badge>-->
 <template>
 <style>
+  :host {
+    max-height: 92px;
+    display: block;
+  }
   paper-button {
     background: #fff;
+    min-width: 172px;
+    margin: 0px 2px 6px;
   }
-  mini-badge {
+/*  mini-badge {
     display: inline-block;
     min-width: 10px;
     padding: 3px 7px;
@@ -19,7 +25,7 @@
     text-align: center;
     background-color: #6F6F6F;
     border-radius: 10px;
-  }
+  } */
 </style>
   <template repeat="{{x in show | justProperties(data, by)}}">
   <paper-button raised="{{!x.filtered}}" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
@@ -137,6 +143,18 @@
         return b.num - a.num;
       })
 
+      if (result.length === 0) {
+        for(var prop in this.filters) {
+          for(var filter in filters[prop]) {
+              debugger;
+            if (filter) {
+              result.push({name:filter});
+            }
+          }
+        }
+      }
+
+      
       return result;
     },
     justOfTypes: function(value,data,types){ console.log('justOfTypes');
