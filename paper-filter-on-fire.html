@@ -1,6 +1,6 @@
 <link rel="import" href="../paper-button/paper-button.html">
 <polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" attributes="data keys show filters filteredKeys by">
-
+<!-- <mini-badge>{{x.num}}</mini-badge>-->
 <template>
 <style>
   paper-button {
@@ -23,7 +23,7 @@
 </style>
   <template repeat="{{x in show | justProperties(data, by)}}">
   <paper-button raised="{{!x.filtered}}" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
-      {{x.name}} <mini-badge>{{x.num}}</mini-badge>
+      {{x.name}} 
     </paper-button>
   </template>
 </template>
