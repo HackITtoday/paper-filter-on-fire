@@ -38,7 +38,7 @@
   function getArray(value,data,theArray) {
     var is = [];
     if (hasOwnProperty(data[value],theArray)) {
-      is = data[value][theArray];
+      is.push(data[value][theArray]);
     }
     return is;
   }  
@@ -168,7 +168,7 @@
         value.forEach(function(entry) {
           if (hasTypes(data[entry],types)) {
             output.push(entry); 
-          }
+          }
         });
         return output;
       }
