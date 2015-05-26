@@ -145,8 +145,7 @@
 
       if (result.length === 0) {
         for(var prop in this.filters) {
-          for(var filter in filters[prop]) {
-              debugger;
+          for(var filter in this.filters[prop]) {
             if (filter) {
               result.push({name:filter});
             }
