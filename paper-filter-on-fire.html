@@ -38,7 +38,7 @@
   function getArray(value,data,theArray) {
     var is = [];
     if (hasOwnProperty(data[value],theArray)) {
-      is.push(data[value][theArray]);
+      is = data[value][theArray];
     }
     return is;
   }  
@@ -89,7 +89,8 @@
       show: []
     },
     keysChanged: function(oldValue, newValue) {
-      this.filteredKeys = newValue;
+//      this.filteredKeys = newValue;
+      this.filteredKeys = this.justOfTypes(this.keys, this.data, this.filters);
     },
     ifFiltered: function(name, properties) { console.log('ifFiltered');
       if (hasOwnProperty(this.filters,properties)) {
@@ -143,7 +144,7 @@
         return b.num - a.num;
       })
 
-      if (result.length === 0) {
+/*      if (result.length === 0) {
         for(var prop in this.filters) {
           for(var filter in this.filters[prop]) {
             if (filter) {
@@ -152,7 +153,7 @@
           }
         }
       }
-
+*/
       
       return result;
     },
@@ -167,7 +168,7 @@
         value.forEach(function(entry) {
           if (hasTypes(data[entry],types)) {
             output.push(entry); 
-          }
+          }
         });
         return output;
       }
