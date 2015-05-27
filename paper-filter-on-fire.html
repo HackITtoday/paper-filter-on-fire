@@ -1,4 +1,7 @@
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../object-hash/object-hash.html">
+<link rel="import" href="../jshashtable/js-hashtable.html">
+
 <polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" attributes="data keys show filters filteredKeys by">
 <!-- <mini-badge>{{x.num}}</mini-badge>-->
 <template>
@@ -28,10 +31,12 @@
   } */
 </style>
   <template repeat="{{x in show | justProperties(data, by)}}">
-  <paper-button raised="{{!x.filtered}}" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
+    <paper-button raised="{{!x.filtered}}" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
       {{x.name}} 
     </paper-button>
   </template>
+  <object-hash hash="{{hash}}"></object-hash>
+  <js-hashtable hashtable="{{hashtable}}"></js-hashtable>
 </template>
 
 <script>
@@ -107,8 +112,7 @@
       if (hasOwnProperty(e.currentTarget.attributes,'filter')){
         if (hasOwnProperty(e.currentTarget.attributes.filter, 'value')) {
           if (hasOwnProperty(this.filters, e.currentTarget.attributes.filter.value)) {
-            this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes.title.value] = 
-            !this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes.title.value];
+	    delete this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes.title.value];
           } else {
             if (this.filters === undefined) { 
               this.filters = {};
@@ -164,13 +168,21 @@
       if (isEmpty(types)) {
         return value;
         } else {
-        var output = [];
-        value.forEach(function(entry) {
-          if (hasTypes(data[entry],types)) {
-            output.push(entry); 
-          }
-        });
-        return output;
+        var thisRunUid = this.hash(types);
+
+        if (this.hashtable.containsKey(thisRunUid)) {
+          debugger;
+          return this.hashtable.get(thisRunUid);
+        } else {
+          var output = [];
+          value.forEach(function(entry) {
+            if (hasTypes(data[entry],types)) {
+              output.push(entry); 
+            }
+          });
+          this.hashtable.put(thisRunUid, output);
+          return output;
+        } 
       }
     },
     ready: function() { 
