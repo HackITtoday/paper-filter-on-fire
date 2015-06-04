@@ -2,8 +2,7 @@
 <link rel="import" href="../object-hash/object-hash.html">
 <link rel="import" href="../jshashtable/js-hashtable.html">
 
-<polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" attributes="data keys show filters filteredKeys by">
-<!-- <mini-badge>{{x.num}}</mini-badge>-->
+<polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" attributes="data show filters filteredKeys by">
 <template>
 <style>
   :host {
@@ -15,7 +14,7 @@
     min-width: 172px;
     margin: 0px 2px 6px;
   }
-/*  mini-badge {
+  mini-badge {
     display: inline-block;
     min-width: 10px;
     padding: 3px 7px;
@@ -28,11 +27,11 @@
     text-align: center;
     background-color: #6F6F6F;
     border-radius: 10px;
-  } */
+  } 
 </style>
   <template repeat="{{x in show | justProperties(data, by)}}">
     <paper-button raised="{{!x.filtered}}" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
-      {{x.name}} 
+      {{x.name}} <mini-badge>{{x.num}}</mini-badge> 
     </paper-button>
   </template>
   <object-hash hash="{{hash}}"></object-hash>
@@ -42,23 +41,11 @@
 <script>
   function getArray(value,data,theArray) {
     var is = [];
-    if (hasOwnProperty(data[value],theArray)) {
+    if (data[value].hasOwnProperty(theArray)) {
       is = data[value][theArray];
     }
     return is;
   }  
-  function hasOwnProperty(obj, prop) {
-    if (typeof obj === 'object' ) {
-      if (obj === null) {
-        return false;
-      }
-      return obj.hasOwnProperty(prop); 
-    } else if (typeof obj === 'undefined') {
-      return false;
-    } else {
-      debugger;
-    }
-  }
   function isEmpty(obj) {
     for(var prop in obj) {
       if(obj.hasOwnProperty(prop)) {
@@ -93,13 +80,13 @@
       filteredKeys: [],
       show: []
     },
-    keysChanged: function(oldValue, newValue) {
+    dataChanged: function(oldValue, newValue) {
 //      this.filteredKeys = newValue;
-      this.filteredKeys = this.justOfTypes(this.keys, this.data, this.filters);
+      this.filteredKeys = this.justOfTypes(newValue, this.filters);
     },
     ifFiltered: function(name, properties) { console.log('ifFiltered');
-      if (hasOwnProperty(this.filters,properties)) {
-        if (hasOwnProperty(this.filters[properties], name)) {
+      if (this.filters.hasOwnProperty(properties)) {
+        if (this.filters[properties].hasOwnProperty(name)) {
           return this.filters[properties][name];
           } else { 
           return false;
@@ -109,9 +96,9 @@
       }
     },
     setFilter: function(e) { console.log('setFilter');
-      if (hasOwnProperty(e.currentTarget.attributes,'filter')){
-        if (hasOwnProperty(e.currentTarget.attributes.filter, 'value')) {
-          if (hasOwnProperty(this.filters, e.currentTarget.attributes.filter.value)) {
+      if (e.currentTarget.attributes.hasOwnProperty('filter')){
+        if (e.currentTarget.attributes.filter.hasOwnProperty('value')) {
+          if (this.filters.hasOwnProperty(e.currentTarget.attributes.filter.value)) {
 	    delete this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes.title.value];
           } else {
             if (this.filters === undefined) { 
@@ -120,14 +107,17 @@
             this.filters[e.currentTarget.attributes.filter.value] = {};
             this.filters[e.currentTarget.attributes.filter.value][e.currentTarget.attributes.title.value] = true;
           }
-          this.filteredKeys = this.justOfTypes(this.keys, this.data, this.filters);
+          this.filteredKeys = this.justOfTypes(this.data, this.filters);
         }
       }
     },
-    justProperties: function(value,data,properties){ console.log('justProperties');
+    justProperties: function(data,properties){ console.log('justProperties');
       var output = [];
       var outputNum = [];
-      if (value !== undefined && value !== null ) {
+      var value = Object.keys(data);
+
+      if (value !== undefined && value !== null && Array.isArray(value) && value.length > 0) {
+        
         var test = function(entryA) {
           if (output.indexOf(entryA) === -1){
             output.push(entryA); 
@@ -168,7 +158,7 @@
       if (isEmpty(types)) {
         return value;
         } else {
-        var thisRunUid = this.hash(types);
+        var thisRunUid = this.hash({t:types,d:object.keys(data)});
 
         if (this.hashtable.containsKey(thisRunUid)) {
           debugger;
