@@ -2,7 +2,7 @@
 <link rel="import" href="../object-hash/object-hash.html">
 <link rel="import" href="../jshashtable/js-hashtable.html">
 
-<polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" attributes="data show filters filteredKeys by">
+<polymer-element id="paperFilterOnFire" name="paper-filter-on-fire" attributes="show data filteredKeys by filters">
 <template>
 <style>
   :host {
@@ -29,7 +29,7 @@
     border-radius: 10px;
   } 
 </style>
-  <template repeat="{{x in show | justProperties(data, by)}}">
+  <template repeat="{{x in show | justProperties(by)}}">
     <paper-button raised="{{!x.filtered}}" on-tap="{{setFilter}}" filter="{{by}}" title="{{x.name}}">
       {{x.name}} <mini-badge>{{x.num}}</mini-badge> 
     </paper-button>
@@ -82,7 +82,7 @@
     },
     dataChanged: function(oldValue, newValue) {
 //      this.filteredKeys = newValue;
-      this.filteredKeys = this.justOfTypes(newValue, this.filters);
+      this.filteredKeys = this.justOfTypes(object.keys(newValue), this.filters);
     },
     ifFiltered: function(name, properties) { console.log('ifFiltered');
       if (this.filters.hasOwnProperty(properties)) {
@@ -111,11 +111,10 @@
         }
       }
     },
-    justProperties: function(data,properties){ console.log('justProperties');
+    justProperties: function(value,properties){ console.log('justProperties');
       var output = [];
       var outputNum = [];
-      var value = Object.keys(data);
-
+      var data = this.data;
       if (value !== undefined && value !== null && Array.isArray(value) && value.length > 0) {
         
         var test = function(entryA) {
